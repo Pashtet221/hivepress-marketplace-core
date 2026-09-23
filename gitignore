@@ -1,0 +1,36 @@
+# Ignore everything by default
+/*
+
+# Keep repository control files
+!/.gitignore
+!/AGENTS.md
+!/README.md
+
+# Allow plugin/theme containers
+!/plugins/
+!/themes/
+
+# Ignore all plugins by default
+/plugins/*
+
+# Allow HivePress core and all HivePress extensions
+!/plugins/hivepress/
+!/plugins/hivepress/**
+!/plugins/hivepress-*/
+!/plugins/hivepress-*/**
+
+# Ignore all themes by default
+/themes/*
+
+# Allow the working theme
+!/themes/site_test/
+!/themes/site_test/**
+
+# Allow ListingHive as read-only reference
+!/themes/listinghive/
+!/themes/listinghive/**
+
+# Common junk
+.DS_Store
+Thumbs.db
+*.log
