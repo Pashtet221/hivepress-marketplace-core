@@ -1,0 +1,111 @@
+# Translation of Plugins - HivePress Reviews - Stable (latest release) in Russian
+# This file is distributed under the same license as the Plugins - HivePress Reviews - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2023-09-06 10:38:50+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? 1 : 2);\n"
+"X-Generator: GlotPress/4.0.3\n"
+"Language: ru\n"
+"Project-Id-Version: Plugins - HivePress Reviews - Stable (latest release)\n"
+
+#: includes/forms/class-review-reply.php:48
+msgid "Your reply has been submitted."
+msgstr "Ваш отзыв отправлен"
+
+#: includes/configs/settings.php:82
+msgid "Allow replying to reviews"
+msgstr "Разрешить отвечать на отзывы"
+
+#: includes/configs/settings.php:81
+msgid "Replies"
+msgstr "Отзывы"
+
+#: includes/forms/class-review-reply.php:64
+msgid "Submit Reply"
+msgstr "Отправить отзыв"
+
+#: includes/components/class-review.php:701
+#: includes/forms/class-review-reply.php:30
+msgid "Reply to Review"
+msgstr "Ответ на отзыв"
+
+#: includes/forms/class-review-reply.php:53
+msgctxt "noun"
+msgid "Reply"
+msgstr "Ответ"
+
+#: templates/review/view/review-reply-link.php:9
+msgid "Reply"
+msgstr "Ответить"
+
+#: includes/blocks/class-reviews.php:100 includes/configs/settings.php:31
+msgctxt "sort order"
+msgid "Rating"
+msgstr "Рейтинг"
+
+#: includes/configs/settings.php:53
+msgid "Allow submitting multiple reviews"
+msgstr "Разрешить добавление нескольких отзывов"
+
+#: includes/configs/settings.php:74
+msgid "Manually approve new reviews"
+msgstr "Вручную одобрять новые отзывы"
+
+#: includes/configs/strings.php:15
+msgid "You can't review your own listings."
+msgstr "Вы не можете оставлять отзывы на собственные объявления."
+
+#. Description of the plugin
+#: hivepress-reviews.php
+msgid "Allow users to rate and review listings."
+msgstr "Дайте пользователям возможность оценивать и оставлять отзывы на объявления."
+
+#: includes/components/class-review.php:496
+msgid "You've already submitted a review."
+msgstr "Вы уже отправили отзыв."
+
+#: includes/components/class-review.php:195
+#: includes/components/class-review.php:574
+#: includes/components/class-review.php:654 includes/models/class-review.php:40
+msgid "Rating"
+msgstr "Рейтинг"
+
+#: includes/configs/strings.php:14
+msgid "Reviews"
+msgstr "Отзывы"
+
+#: includes/components/class-review.php:616
+#: includes/forms/class-review-submit.php:30
+#: templates/listing/view/page/review-submit-link.php:7
+msgid "Write a Review"
+msgstr "Написать отзыв"
+
+#: includes/forms/class-review-submit.php:67
+msgid "Submit Review"
+msgstr "Отправить отзыв"
+
+#: includes/forms/class-review-submit.php:48
+msgid "Your review has been submitted."
+msgstr "Ваш отзыв отправлен."
+
+#: includes/models/class-review.php:32
+msgid "Review"
+msgstr "Отзыв"
+
+#. Plugin Name of the plugin
+#: hivepress-reviews.php
+msgid "HivePress Reviews"
+msgstr "HivePress Отзывы"
+
+#. Author of the plugin
+#: hivepress-reviews.php
+msgid "HivePress"
+msgstr "HivePress"
+
+#. Author URI of the plugin
+#: hivepress-reviews.php
+msgid "https://hivepress.io/"
+msgstr "https://hivepress.io/"

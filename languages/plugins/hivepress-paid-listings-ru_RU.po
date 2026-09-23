@@ -1,0 +1,157 @@
+# Translation of Plugins - HivePress Paid Listings - Stable (latest release) in Russian
+# This file is distributed under the same license as the Plugins - HivePress Paid Listings - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2022-04-21 11:58:04+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? 1 : 2);\n"
+"X-Generator: GlotPress/4.0.1\n"
+"Language: ru\n"
+"Project-Id-Version: Plugins - HivePress Paid Listings - Stable (latest release)\n"
+
+#: includes/configs/settings.php:46
+msgid "Free Packages"
+msgstr "Бесплатные пакеты"
+
+#: includes/configs/settings.php:47
+msgid "Allow multiple free packages"
+msgstr "Разрешить многоразовые бесплатные пакеты"
+
+#: includes/configs/settings.php:48
+msgid "Check this option to allow selecting free packages multiple times."
+msgstr "Выберите эту опцию, чтобы разрешить многоразовый выбор бесплатных пакетов."
+
+#: includes/configs/meta-boxes.php:55
+msgid "Recommend this package"
+msgstr "Рекомендовать этот пакет"
+
+#: includes/configs/meta-boxes.php:54
+#: templates/listing-package/view/listing-package-primary-badge.php:7
+msgctxt "package"
+msgid "Recommended"
+msgstr "Рекомендуемый"
+
+#: includes/configs/strings.php:17
+msgid "Listing Featured"
+msgstr "Объявление рекламируется"
+
+#: includes/configs/strings.php:21
+msgid "Thank you! Your listing \"%s\" is featured and will appear at the top of the page."
+msgstr "Спасибо! Ваше объявление \"%s\" рекламируется и будет отображаться вверху страницы."
+
+#. Description of the plugin
+#: hivepress-paid-listings.php
+msgid "Charge users for adding, featuring and renewing listings."
+msgstr "Берите с пользователей плату за добавление, рекламирование и обновление объявлений."
+
+#: includes/configs/strings.php:24
+msgid "Choose a product that must be purchased in order to feature a listing."
+msgstr "Выберите продукт, который должен быть куплен для рекламы объявления."
+
+#: includes/configs/settings.php:31
+msgid "Featuring Period"
+msgstr "Срок рекламирования"
+
+#: includes/configs/settings.php:17
+msgid "Featuring"
+msgstr "Реклама"
+
+#: includes/configs/strings.php:18
+msgid "Listing Packages"
+msgstr "Пакеты объявлений"
+
+#: includes/configs/strings.php:23
+msgid "Set the number of days after which a listing loses featured status."
+msgstr "Введите количество дней, после которого объявление не будет рекламироваться."
+
+#: templates/listing/edit/block/listing-feature-link.php:8
+#: templates/listing/edit/page/listing-feature-link.php:7
+msgid "Feature"
+msgstr "Рекламировать"
+
+#: templates/listing/edit/block/listing-feature-link.php:10
+msgctxt "listing"
+msgid "Featured"
+msgstr "Рекламируется"
+
+#: includes/configs/post-types.php:23 includes/configs/post-types.php:26
+msgid "Add Package"
+msgstr "Добавить пакет"
+
+#: includes/configs/post-types.php:24
+msgctxt "package"
+msgid "Add New"
+msgstr "Добавить новый"
+
+#: includes/configs/strings.php:22
+msgid "Set the maximum number of listing submissions."
+msgstr "Введите максимальное количество объявлений для добавления."
+
+#: includes/controllers/class-listing-package.php:39
+#: includes/controllers/class-listing-package.php:47
+msgctxt "imperative"
+msgid "Select Package"
+msgstr "Выберите пакет"
+
+#: includes/configs/strings.php:16
+msgid "Feature Listing"
+msgstr "Рекламировать объявление"
+
+#: includes/configs/meta-boxes.php:21
+msgid "Choose a product that must be purchased in order to get this package."
+msgstr "Выберите продукт, который должен быть куплен для получения пакета."
+
+#: includes/configs/post-types.php:21 includes/configs/post-types.php:27
+#: includes/configs/settings.php:41
+#: includes/controllers/class-listing-package.php:55
+msgid "Packages"
+msgstr "Пакеты"
+
+#: includes/configs/post-types.php:22
+msgid "Package"
+msgstr "Пакет"
+
+#: includes/configs/post-types.php:25
+msgid "Edit Package"
+msgstr "Редактировать пакет"
+
+#: includes/configs/post-types.php:28
+msgid "Search Packages"
+msgstr "Искать пакеты"
+
+#: includes/configs/post-types.php:29 includes/configs/post-types.php:30
+msgid "No packages found."
+msgstr "Пакетов не найдено."
+
+#: includes/configs/strings.php:19
+msgid "Listing Limit"
+msgstr "Лимит объявлений"
+
+#: includes/configs/strings.php:20
+msgid "Limit Exceeded"
+msgstr "Лимит превышен"
+
+#: includes/configs/strings.php:15
+msgid "Buy Package"
+msgstr "Купить пакет"
+
+#: includes/configs/strings.php:14
+msgid "Select Package"
+msgstr "Выбрать пакет"
+
+#. Plugin Name of the plugin
+#: hivepress-paid-listings.php
+msgid "HivePress Paid Listings"
+msgstr "HivePress Платные объявления"
+
+#. Author of the plugin
+#: hivepress-paid-listings.php
+msgid "HivePress"
+msgstr "HivePress"
+
+#. Author URI of the plugin
+#: hivepress-paid-listings.php
+msgid "https://hivepress.io/"
+msgstr "https://hivepress.io/"
