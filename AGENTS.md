@@ -1,29 +1,30 @@
-# Codex access rules — HivePress Marketplace
+## Working theme
 
-## Writable project code
-Codex may read and modify files ONLY in:
-
-- `themes/site_test/`
-
-This is the custom project theme and is the only location where implementation changes should be made unless the user explicitly authorizes another path.
-
-## Read-only reference code
-Codex may inspect, search, and analyze the following paths, but MUST NOT modify them:
+The active project theme is:
 
 - `themes/listinghive/`
+
+Codex may read and modify files inside this directory.
+
+All project implementation changes must be made inside
+`themes/listinghive/` unless the user explicitly instructs otherwise.
+
+## Read-only dependencies
+
+Codex may inspect, search and analyze:
+
 - `plugins/hivepress/`
 - `plugins/hivepress-*/`
 
-These directories are third-party HivePress/ListingHive dependencies and are included only so Codex can understand models, hooks, filters, templates, APIs, and integration behavior.
+These directories are third-party dependencies and MUST NOT be modified.
 
-## Forbidden
-All other `wp-content` directories and files are outside the project scope. Do not read, edit, generate patches for, or rely on them unless the user explicitly grants access.
+When implementing HivePress-related functionality:
 
-## Implementation policy
-When a requested change depends on HivePress or ListingHive:
+1. Inspect the relevant HivePress source code.
+2. Find existing hooks, filters, APIs and extension points.
+3. Implement project-specific changes inside `themes/listinghive/`.
+4. Never patch HivePress or HivePress extensions directly.
 
-1. Inspect the relevant read-only dependency code.
-2. Identify supported hooks, filters, template overrides, APIs, models, or extension points.
-3. Implement the change in `themes/site_test/`.
-4. Never patch HivePress plugins or ListingHive directly.
-5. If the requested behavior cannot be implemented safely from the custom theme, explain the limitation before changing any read-only dependency.
+## Scope
+
+Everything outside `themes/listinghive/` is read-only by default.
