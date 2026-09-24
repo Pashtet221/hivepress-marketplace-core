@@ -1,6 +1,12 @@
 (function($) {
 	'use strict';
 
+	var listingDetailsCount = 0,
+		listingDetailsLabels = {
+			show: 'Показать характеристики',
+			hide: 'Скрыть характеристики'
+		};
+
 	function showListingImage(container, index) {
 		var slides = container.querySelectorAll('.hp-listing__image-slide'),
 			dots = container.querySelectorAll('.hp-listing__image-dot');
@@ -22,6 +28,71 @@
 			dot.classList.toggle('hp-listing__image-dot--active', dotIndex === index);
 		});
 	}
+
+	function initListingDetails(scope) {
+		var cards = scope.querySelectorAll ? Array.prototype.slice.call(scope.querySelectorAll('.hp-listing--view-block')) : [];
+
+		if (scope.matches && scope.matches('.hp-listing--view-block')) {
+			cards.unshift(scope);
+		}
+
+		cards.forEach(function(card) {
+			var details = card.querySelector('.hp-listing__attributes--secondary'),
+				button,
+				detailsID;
+
+			if (!details || details.dataset.detailsToggle) {
+				return;
+			}
+
+			listingDetailsCount += 1;
+			detailsID = 'listing-details-' + listingDetailsCount;
+			details.id = detailsID;
+			details.hidden = true;
+			details.dataset.detailsToggle = 'true';
+
+			button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'hp-listing__details-toggle';
+			button.setAttribute('aria-controls', detailsID);
+			button.setAttribute('aria-expanded', 'false');
+			button.textContent = listingDetailsLabels.show;
+			details.parentNode.insertBefore(button, details);
+		});
+	}
+
+	document.addEventListener('click', function(event) {
+		var button = event.target.closest('.hp-listing__details-toggle'),
+			details,
+			isExpanded;
+
+		if (!button) {
+			return;
+		}
+
+		details = document.getElementById(button.getAttribute('aria-controls'));
+
+		if (!details) {
+			return;
+		}
+
+		isExpanded = button.getAttribute('aria-expanded') === 'true';
+		button.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+		button.textContent = isExpanded ? listingDetailsLabels.show : listingDetailsLabels.hide;
+		details.hidden = isExpanded;
+	});
+
+	initListingDetails(document);
+
+	new MutationObserver(function(mutations) {
+		mutations.forEach(function(mutation) {
+			mutation.addedNodes.forEach(function(node) {
+				if (node.nodeType === 1) {
+					initListingDetails(node);
+				}
+			});
+		});
+	}).observe(document.body, { childList: true, subtree: true });
 
 	document.addEventListener('pointermove', function(event) {
 		var container = event.target.closest('.hp-listing__image--preview'),

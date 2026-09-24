@@ -1054,6 +1054,52 @@ HivePress
 			font-size: 0.6875rem;
 		}
 
+		&--view-block &__details-toggle {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			width: 100%;
+			border: 0;
+			border-radius: @border-radius;
+			padding: 0.625rem 0.75rem;
+			background-color: rgba(7, 36, 86, 0.045);
+			color: rgba(15, 23, 39, 0.65);
+			font-size: 0.8125rem;
+			font-weight: 500;
+			line-height: 1.25;
+			text-align: left;
+			cursor: pointer;
+			transition: background-color @animation-duration, color @animation-duration;
+
+			&:hover,
+			&:focus-visible {
+				background-color: rgba(7, 36, 86, 0.085);
+				color: rgba(15, 23, 39, 0.85);
+			}
+
+			&:focus-visible {
+				outline: 2px solid @primary-color;
+				outline-offset: 2px;
+			}
+
+			&::after {
+				.font-icon;
+				content: '\f078';
+				margin-left: 0.75rem;
+				font-size: 11px;
+				color: rgba(7, 36, 86, 0.35);
+				transition: transform @animation-duration;
+			}
+
+			&[aria-expanded='true']::after {
+				transform: rotate(180deg);
+			}
+
+			& + .hp-listing__attributes--secondary {
+				margin-top: 0.75rem;
+			}
+		}
+
 		&__details &__categories {
 			display: none !important;
 		}
