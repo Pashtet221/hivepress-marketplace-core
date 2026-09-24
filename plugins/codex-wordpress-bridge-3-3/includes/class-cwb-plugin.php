@@ -170,6 +170,16 @@ final class CWB_Plugin {
 
 		register_rest_route(
 			self::REST_NAMESPACE,
+			'/post-types',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'list_post_types' ),
+				'permission_callback' => array( $this, 'can_read' ),
+			)
+		);
+
+		register_rest_route(
+			self::REST_NAMESPACE,
 			'/posts/(?P<id>\d+)',
 			array(
 				array(
@@ -347,7 +357,38 @@ final class CWB_Plugin {
 
 	private function allowed_post_types() {
 		$types = array( 'page', 'post', 'plugin', 'wpds-case', 'service' );
+
+		// HivePress and its extensions register their models as hp_* post types.
+		// Discover them at runtime so newly installed extensions work without a
+		// Bridge release or a site-specific allowlist filter.
+		foreach ( get_post_types( array(), 'names' ) as $post_type ) {
+			if ( 0 === strpos( $post_type, 'hp_' ) ) {
+				$types[] = $post_type;
+			}
+		}
+
 		return array_values( array_unique( array_map( 'sanitize_key', (array) apply_filters( 'cwb_allowed_post_types', $types ) ) ) );
+	}
+
+	public function list_post_types() {
+		$items = array();
+		foreach ( $this->allowed_post_types() as $name ) {
+			$object = get_post_type_object( $name );
+			if ( ! $object ) {
+				continue;
+			}
+
+			$items[] = array(
+				'name'       => $name,
+				'label'      => $object->label,
+				'hivepress'  => 0 === strpos( $name, 'hp_' ),
+				'hierarchical' => (bool) $object->hierarchical,
+				'taxonomies' => array_values( get_object_taxonomies( $name, 'names' ) ),
+				'supports'   => array_keys( (array) get_all_post_type_supports( $name ) ),
+			);
+		}
+
+		return rest_ensure_response( array( 'items' => $items ) );
 	}
 
 	private function publish_allowed() {
@@ -480,6 +521,11 @@ final class CWB_Plugin {
 			}
 		}
 
+		$hivepress_result = $this->apply_hivepress_data( $post_id, $post_type, $data );
+		if ( is_wp_error( $hivepress_result ) ) {
+			return $hivepress_result;
+		}
+
 		return new WP_REST_Response( $this->prepare_post_full( get_post( $post_id ) ), 201 );
 	}
 
@@ -562,7 +608,80 @@ final class CWB_Plugin {
 			}
 		}
 
+		$hivepress_result = $this->apply_hivepress_data( $post_id, $post->post_type, $data );
+		if ( is_wp_error( $hivepress_result ) ) {
+			return $hivepress_result;
+		}
+
 		return rest_ensure_response( $this->prepare_post_full( get_post( $post_id ) ) );
+	}
+
+	private function apply_hivepress_data( $post_id, $post_type, array $data ) {
+		if ( 0 !== strpos( $post_type, 'hp_' ) ) {
+			return true;
+		}
+
+		if ( isset( $data['hivepress_meta'] ) ) {
+			if ( ! is_array( $data['hivepress_meta'] ) ) {
+				return new WP_Error( 'cwb_invalid_hivepress_meta', 'hivepress_meta должен быть JSON-объектом.', array( 'status' => 400 ) );
+			}
+
+			foreach ( $data['hivepress_meta'] as $key => $value ) {
+				$key = sanitize_key( $key );
+				if ( 0 !== strpos( $key, 'hp_' ) || $this->is_sensitive_meta_key( $key ) ) {
+					return new WP_Error( 'cwb_forbidden_hivepress_meta', 'Недопустимое HivePress meta-поле: ' . $key, array( 'status' => 400 ) );
+				}
+
+				$old = get_post_meta( $post_id, $key, true );
+				$new = $this->sanitize_meta_value( $value );
+				if ( null === $value || '' === $value ) {
+					delete_post_meta( $post_id, $key );
+				} else {
+					update_post_meta( $post_id, $key, $new );
+				}
+				$this->log_change( 'update_hivepress_meta', $post_type, $post_id, $key, $old, get_post_meta( $post_id, $key, true ) );
+			}
+		}
+
+		if ( isset( $data['taxonomies'] ) ) {
+			if ( ! is_array( $data['taxonomies'] ) ) {
+				return new WP_Error( 'cwb_invalid_taxonomies', 'taxonomies должен быть JSON-объектом.', array( 'status' => 400 ) );
+			}
+
+			foreach ( $data['taxonomies'] as $taxonomy => $terms ) {
+				$taxonomy = sanitize_key( $taxonomy );
+				if ( 0 !== strpos( $taxonomy, 'hp_' ) || ! is_object_in_taxonomy( $post_type, $taxonomy ) ) {
+					return new WP_Error( 'cwb_invalid_hivepress_taxonomy', 'Таксономия не относится к этому типу записи: ' . $taxonomy, array( 'status' => 400 ) );
+				}
+				$taxonomy_object = get_taxonomy( $taxonomy );
+				if ( ! $taxonomy_object || ! current_user_can( $taxonomy_object->cap->assign_terms ) ) {
+					return new WP_Error( 'cwb_cannot_assign_terms', 'Недостаточно прав для назначения терминов: ' . $taxonomy, array( 'status' => 403 ) );
+				}
+
+				$term_ids = array_values( array_filter( array_map( 'absint', (array) $terms ) ) );
+				$result   = wp_set_object_terms( $post_id, $term_ids, $taxonomy, false );
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
+				$this->log_change( 'update_hivepress_terms', $post_type, $post_id, $taxonomy, null, $term_ids );
+			}
+		}
+
+		return true;
+	}
+
+	private function sanitize_meta_value( $value ) {
+		if ( is_array( $value ) ) {
+			return array_map( array( $this, 'sanitize_meta_value' ), $value );
+		}
+		if ( is_bool( $value ) || is_int( $value ) || is_float( $value ) ) {
+			return $value;
+		}
+		return sanitize_textarea_field( (string) $value );
+	}
+
+	private function is_sensitive_meta_key( $key ) {
+		return (bool) preg_match( '/(?:password|passwd|secret|token|api[_-]?key|private[_-]?key|application[_-]?password)/i', $key );
 	}
 
 	public function upload_media( WP_REST_Request $request ) {
@@ -1274,7 +1393,57 @@ final class CWB_Plugin {
 		}
 		$data['acf'] = $this->prepare_acf_values( $post->ID );
 		$data['frontend_meta'] = $this->prepare_frontend_meta( $post->ID );
+		if ( 0 === strpos( $post->post_type, 'hp_' ) ) {
+			$data['hivepress_meta'] = $this->prepare_hivepress_meta( $post->ID );
+			$data['taxonomies']     = $this->prepare_hivepress_taxonomies( $post->ID, $post->post_type );
+		}
 		return $data;
+	}
+
+	private function prepare_hivepress_meta( $post_id ) {
+		$result = array();
+		foreach ( get_post_meta( $post_id ) as $key => $values ) {
+			if ( 0 !== strpos( $key, 'hp_' ) || $this->is_sensitive_meta_key( $key ) ) {
+				continue;
+			}
+
+			$value = count( $values ) > 1 ? $values : reset( $values );
+			if ( is_array( $value ) ) {
+				$value = array_map( 'maybe_unserialize', $value );
+			} else {
+				$value = maybe_unserialize( $value );
+			}
+			$result[ $key ] = $value;
+		}
+
+		return (array) apply_filters( 'cwb_hivepress_meta', $result, $post_id );
+	}
+
+	private function prepare_hivepress_taxonomies( $post_id, $post_type ) {
+		$result = array();
+		foreach ( get_object_taxonomies( $post_type, 'names' ) as $taxonomy ) {
+			if ( 0 !== strpos( $taxonomy, 'hp_' ) ) {
+				continue;
+			}
+
+			$terms = wp_get_object_terms( $post_id, $taxonomy );
+			if ( is_wp_error( $terms ) ) {
+				continue;
+			}
+			$result[ $taxonomy ] = array_map(
+				function ( $term ) {
+					return array(
+						'id'     => (int) $term->term_id,
+						'name'   => $term->name,
+						'slug'   => $term->slug,
+						'parent' => (int) $term->parent,
+					);
+				},
+				$terms
+			);
+		}
+
+		return $result;
 	}
 
 	private function log_change( $action, $object_type, $object_id, $field_name, $old_value, $new_value ) {

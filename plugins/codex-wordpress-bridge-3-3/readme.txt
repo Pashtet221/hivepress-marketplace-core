@@ -4,7 +4,7 @@ Tags: rest-api, acf, codex, content-management
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.6.0
+Stable tag: 0.7.0
 License: GPLv2 or later
 
 Безопасный REST-мост для управления страницами, записями, услугами, ACF и Rank Math SEO из Codex.
@@ -32,6 +32,9 @@ License: GPLv2 or later
 * SEO PATCH запрещает изменение ID, slug, URL, post_type, status, контента и остальных полей записи.
 * После SEO PATCH Bridge повторно читает объект из WordPress и возвращает полный объект, ACF и SEO/meta.
 * Полный объект записи содержит безопасно экспонированные ACF и frontend meta. Потенциально секретные ACF-поля по умолчанию скрыты.
+* Все зарегистрированные типы записей HivePress (`hp_*`) автоматически доступны без ручного whitelist.
+* Полные ответы HivePress-записей содержат `hivepress_meta` и назначенные термины `taxonomies`.
+* Создание и обновление HivePress-записей поддерживает безопасные поля `hivepress_meta` и `taxonomies`.
 
 
 == Установка ==
@@ -50,6 +53,8 @@ GET /wp-json/codex-bridge/v1/health
 == Основные маршруты ==
 
 GET  /wp-json/codex-bridge/v1/posts?post_type=page&search=Доставка
+GET  /wp-json/codex-bridge/v1/posts?post_type=hp_listing&status=any&per_page=100&page=1
+GET  /wp-json/codex-bridge/v1/post-types
 POST /wp-json/codex-bridge/v1/posts
 GET  /wp-json/codex-bridge/v1/posts/123
 PATCH /wp-json/codex-bridge/v1/posts/123
@@ -81,6 +86,19 @@ PATCH /wp-json/codex-bridge/v1/posts/123/thumbnail
 {
   "title": "Новое название",
   "content": "<p>Новый текст</p>"
+}
+
+Обновление объявления HivePress (значения таксономий — ID существующих терминов):
+
+{
+  "title": "Новое название объявления",
+  "hivepress_meta": {
+    "hp_price": 1500,
+    "hp_featured": true
+  },
+  "taxonomies": {
+    "hp_listing_category": [12, 18]
+  }
 }
 
 Обновление ACF:
@@ -213,3 +231,9 @@ GET /wp-json/codex-bridge/v1/posts/123/seo
 * После PATCH возвращается повторно прочитанный полный объект.
 * В полный объект добавлены безопасные ACF/frontend meta для аудита.
 * Добавлена защита от изменения идентичности/URL/статуса записи через SEO PATCH.
+
+== 0.7.0 ==
+* Bridge автоматически обнаруживает все зарегистрированные типы записей HivePress и расширений по префиксу `hp_`.
+* Добавлен GET `/post-types` для просмотра доступных типов, таксономий и поддерживаемых возможностей.
+* Чтение, создание и обновление HivePress-записей дополнено meta-полями `hp_*` и таксономиями `hp_*`.
+* Секретоподобные meta-ключи не выдаются и не принимаются.
