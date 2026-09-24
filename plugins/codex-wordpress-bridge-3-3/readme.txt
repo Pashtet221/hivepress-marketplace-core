@@ -4,7 +4,7 @@ Tags: rest-api, acf, codex, content-management
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.7.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 
 Безопасный REST-мост для управления страницами, записями, услугами, ACF и Rank Math SEO из Codex.
@@ -237,3 +237,137 @@ GET /wp-json/codex-bridge/v1/posts/123/seo
 * Добавлен GET `/post-types` для просмотра доступных типов, таксономий и поддерживаемых возможностей.
 * Чтение, создание и обновление HivePress-записей дополнено meta-полями `hp_*` и таксономиями `hp_*`.
 * Секретоподобные meta-ключи не выдаются и не принимаются.
+
+== HivePress API (1.0.0) ==
+
+Bridge 1.0 exposes normalized resources; clients do not send arbitrary post meta.
+All routes require `use_codex_bridge`. Every write additionally checks the native
+post-type or taxonomy capability. Publishing `hp_listing`,
+`hp_listing_attribute`, or `hp_vendor` additionally requires
+`publish_codex_bridge_content`. There are no delete routes.
+
+=== Routes ===
+
+* `GET /taxonomies` — allowed taxonomy discovery.
+* `GET|POST /taxonomies/{taxonomy}/terms` — list/create terms.
+* `GET|PATCH /taxonomies/{taxonomy}/terms/{id}` — read/update a term.
+* `GET|POST /hivepress/listing-attributes` — list/create listing attributes.
+* `GET|PATCH /hivepress/listing-attributes/{id}` — read/update an attribute.
+* `GET|POST /hivepress/listing-attributes/{id}/options` — list/create select options.
+* `PATCH /hivepress/listing-attributes/{id}/options/{option_id}` — update an option.
+* `GET /hivepress/listings/schema` — runtime listing/attribute contract.
+* `GET|POST /hivepress/listings` — list/create listings.
+* `GET|PATCH /hivepress/listings/{id}` — read/update a listing.
+* `GET|POST /hivepress/vendors` — list/create vendors.
+* `GET|PATCH /hivepress/vendors/{id}` — read/update a vendor.
+* `GET /users` — safe user identity and relevant capabilities (never email).
+* `GET /media` and `GET /media/{id}` — attachment inspection without server paths.
+
+=== Taxonomy schemas ===
+
+`GET /taxonomies` returns `{items:[{name,label,object_types,hierarchical,
+capabilities,hivepress,writable,supported_operations}]}`. A term is
+`{id,taxonomy,name,slug,description,parent,count,url}`. List filters are `search`,
+`slug`, `parent`, `hide_empty`, `per_page` (maximum 100), and `page`; the envelope
+is `{items,total,total_pages,page}`. Create accepts `name` (required), `slug`,
+`description`, and `parent`; PATCH accepts those same four fields. Slug collisions,
+foreign parents, hierarchy cycles, and taxonomies outside allowed post types are
+rejected.
+
+=== Listing attribute schema ===
+
+An attribute response is `{id,label,slug,status,field_type,editable,required,
+filterable,searchable,search_field_type,sortable,display_format,display_areas,
+decimals,min_value,max_value,category_ids,option_taxonomy,options}`. Create requires
+`label` and `slug`, supports `field_type` `text`, `number`, or `select`, and accepts
+all remaining response settings plus `options`. PATCH is partial. `display_areas`
+is restricted to HivePress block/page primary, secondary, and ternary areas.
+Number precision is 0–6. Category IDs must be `hp_listing_category` terms.
+
+A select option request is `{name,slug?,description?,parent?}` and its response is
+the term schema. The Bridge derives HivePress's `hp_listing_{attribute}` taxonomy,
+registers it for the current request after an attribute write, clears the relevant
+HivePress model cache, and returns real term IDs. Options are always assigned to a
+listing by ID, never by their display label.
+
+Example attribute request:
+
+    {
+      "label":"Condition","slug":"condition","field_type":"select",
+      "editable":true,"required":false,"filterable":true,
+      "search_field_type":"select","sortable":false,
+      "display_format":"%label%: %value%",
+      "display_areas":["view_block_secondary","view_page_secondary"],
+      "category_ids":[123],
+      "options":[{"name":"New","slug":"new"},{"name":"Good","slug":"good"}]
+    }
+
+=== Listing schema and CRUD ===
+
+`GET /hivepress/listings/schema` describes the detected category taxonomy,
+vendor type, normalized fields, every published attribute, its internal field,
+expected value, select taxonomy/options, price discovery, geolocation availability,
+media support, statuses, and the caller's publication permission.
+
+Create/PATCH accepts only `{title,slug,content|description,status,category_id,
+author_id,vendor_id,price,location,coordinates,featured_media,gallery_media,
+attributes}`. `attributes` is keyed by attribute slug. Text values are strings,
+number values are numeric and rounded to the configured decimals, and select values
+must be option term IDs belonging to that attribute taxonomy. Price is represented
+by the published `price` attribute when installed; send either top-level `price` or
+`attributes.price` (the schema reports whether it exists). Location is accepted
+only when HivePress Geolocation is active. `coordinates` may contain `latitude` and
+`longitude`.
+
+A listing response is `{id,title,slug,status,url,permalink,content,category,author,
+vendor,price,formatted_price,location,coordinates,featured_media,gallery_media,
+attributes,created,modified}`. Each attribute contains `{attribute_id,label,slug,
+type,raw_value,display_value,option_id}`. Writes return a freshly read object.
+
+Example:
+
+    {
+      "title":"Example","content":"Description","status":"draft",
+      "category_id":123,"vendor_id":456,"featured_media":800,
+      "gallery_media":[800,801],
+      "attributes":{"manufacturer":701,"model":"3CX","year":2021}
+    }
+
+`author_id` defaults to the vendor's `post_author` when a vendor is supplied, and
+the Bridge rejects mismatched author/vendor pairs. Gallery items must be existing
+image attachments and are attached using HivePress's `images` parent field.
+
+=== Vendors, users, and media ===
+
+Vendor create accepts `{name,slug?,description?,status?,user_id?,
+create_demo_user?,featured_media?,attributes?}`. An existing `user_id` is preferred.
+`create_demo_user:true` additionally requires WordPress `create_users`; it creates
+a subscriber with a random password and an `example.invalid` email. Passwords are
+neither accepted nor returned. Vendor responses expose `user_id` and safe user
+identity only. Vendor PATCH does not create or modify users.
+
+`GET /users` returns `{items:[{id,display_name,slug,roles,capabilities}]}` and never
+returns email. Media list filters are `search`, `mime_type`, `parent`, `per_page`,
+and `page`. Media objects are `{id,title,alt,caption,description,mime_type,width,
+height,filesize,url,source_url,parent,created,modified}`; filesystem paths are never
+returned. Existing upload and sideload routes are unchanged.
+
+=== HivePress storage verified for this implementation ===
+
+HivePress 1.7.31 registers `hp_listing`, `hp_vendor`, and
+`hp_listing_attribute`; `hp_listing_category` is hierarchical. Listing vendor and
+user relations are `post_parent` and `post_author`. Attribute settings use the
+`hp_edit_field_*`, `hp_search_field_*`, and display/behavior metadata registered by
+HivePress. Non-select values use `hp_{slug}`; select values are term relationships
+in `hp_listing_{normalized_slug}`. Listing images are attachment children marked
+with `hp_parent_field=images`. Geolocation contributes `hp_location`,
+`hp_latitude`, and `hp_longitude`. This installation has no marketplace price
+extension; price is available only when a `price` listing attribute exists.
+
+=== Limitations ===
+
+There is intentionally no permanent delete, arbitrary meta, general user CRUD, or
+password API. Creating a vendor-specific custom attribute payload is reserved for
+a future schema endpoint; the `attributes` key is accepted for forward compatibility
+but ignored rather than written as arbitrary metadata. New routes must be deployed
+to the running WordPress installation before they can be exercised remotely.
