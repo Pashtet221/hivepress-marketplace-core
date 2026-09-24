@@ -8,6 +8,7 @@ final class CWB_Plugin {
 	const REST_NAMESPACE = 'codex-bridge/v1';
 	const ROLE           = 'codex_content_manager';
 	const CAPABILITY     = 'use_codex_bridge';
+	const PUBLISH_CAPABILITY = 'publish_codex_bridge_content';
 	const TABLE_SUFFIX   = 'codex_bridge_log';
 
 	private static $instance = null;
@@ -21,6 +22,8 @@ final class CWB_Plugin {
 	}
 
 	private function __construct() {
+		require_once CWB_DIR . 'includes/class-cwb-hivepress-api.php';
+		new CWB_HivePress_API( $this );
 		add_action( 'init', array( __CLASS__, 'refresh_role_capabilities' ), 99 );
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
@@ -50,6 +53,7 @@ final class CWB_Plugin {
 			'manage_categories'    => true,
 			'upload_files'         => true,
 			self::CAPABILITY       => true,
+			self::PUBLISH_CAPABILITY => true,
 		);
 
 		$role = get_role( self::ROLE );
@@ -70,6 +74,7 @@ final class CWB_Plugin {
 		$administrator = get_role( 'administrator' );
 		if ( $administrator ) {
 			$administrator->add_cap( self::CAPABILITY );
+			$administrator->add_cap( self::PUBLISH_CAPABILITY );
 		}
 	}
 
@@ -334,6 +339,7 @@ final class CWB_Plugin {
 				'allowed_types'  => $this->allowed_post_types(),
 				'current_user'   => get_current_user_id(),
 				'publish_allowed'=> $this->publish_allowed(),
+				'publish_post_types' => $this->publish_allowed() ? array_values( array_intersect( array( 'hp_listing', 'hp_listing_attribute', 'hp_vendor' ), $this->allowed_post_types() ) ) : array(),
 				'seo'            => array(
 					'endpoint' => '/posts/{id}/seo',
 					'fields'   => array( 'rank_math_title', 'rank_math_description', 'rank_math_focus_keyword', 'rank_math_canonical_url', 'rank_math_robots' ),
@@ -391,8 +397,12 @@ final class CWB_Plugin {
 		return rest_ensure_response( array( 'items' => $items ) );
 	}
 
-	private function publish_allowed() {
-		return (bool) apply_filters( 'cwb_allow_publish', false );
+	public function publish_allowed( $post_type = '' ) {
+		if ( ! current_user_can( self::PUBLISH_CAPABILITY ) ) {
+			return false;
+		}
+		$publish_types = array( 'hp_listing', 'hp_listing_attribute', 'hp_vendor' );
+		return ! $post_type || in_array( sanitize_key( $post_type ), $publish_types, true );
 	}
 
 	private function normalize_post_type( $post_type ) {
@@ -408,12 +418,12 @@ final class CWB_Plugin {
 		return true;
 	}
 
-	private function normalize_status( $status, $existing_status = 'draft' ) {
+	private function normalize_status( $status, $existing_status = 'draft', $post_type = '' ) {
 		$status = sanitize_key( (string) $status );
 		if ( '' === $status ) {
 			return $existing_status;
 		}
-		if ( 'publish' === $status && ! $this->publish_allowed() ) {
+		if ( 'publish' === $status && ! $this->publish_allowed( $post_type ) ) {
 			return 'draft';
 		}
 		$allowed = array( 'draft', 'pending', 'private', 'publish' );
@@ -491,7 +501,7 @@ final class CWB_Plugin {
 			'post_name'    => sanitize_title( $data['slug'] ?? '' ),
 			'post_content' => wp_kses_post( $data['content'] ?? '' ),
 			'post_excerpt' => wp_kses_post( $data['excerpt'] ?? '' ),
-			'post_status'  => $this->normalize_status( $data['status'] ?? 'draft', 'draft' ),
+			'post_status'  => $this->normalize_status( $data['status'] ?? 'draft', 'draft', $post_type ),
 			'post_parent'  => absint( $data['parent'] ?? 0 ),
 			'menu_order'   => intval( $data['menu_order'] ?? 0 ),
 		);
@@ -569,7 +579,7 @@ final class CWB_Plugin {
 		}
 
 		if ( array_key_exists( 'status', $data ) ) {
-			$update['post_status'] = $this->normalize_status( $data['status'], $post->post_status );
+			$update['post_status'] = $this->normalize_status( $data['status'], $post->post_status, $post->post_type );
 		}
 
 		if ( count( $update ) > 1 ) {
@@ -1446,7 +1456,7 @@ final class CWB_Plugin {
 		return $result;
 	}
 
-	private function log_change( $action, $object_type, $object_id, $field_name, $old_value, $new_value ) {
+	public function log_change( $action, $object_type, $object_id, $field_name, $old_value, $new_value ) {
 		global $wpdb;
 		$table = $wpdb->prefix . self::TABLE_SUFFIX;
 		$operation_id = 'op_' . gmdate( 'Ymd_His' ) . '_' . wp_generate_password( 6, false, false );
