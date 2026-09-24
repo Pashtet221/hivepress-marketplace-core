@@ -2,8 +2,8 @@
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
+$image_count = count( (array) $listing->get_images__id() );
 $images      = array_values( (array) $listing->get_images() );
-$image_count = count( $images );
 $listing_url = hivepress()->router->get_url( 'listing_view_page', [ 'listing_id' => $listing->get_id() ] );
 ?>
 <div class="hp-listing__image hp-listing__image--preview" data-image-count="<?php echo esc_attr( $image_count ); ?>">
