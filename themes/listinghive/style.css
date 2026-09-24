@@ -866,6 +866,54 @@ HivePress
   letter-spacing: 1px;
   font-size: 0.6875rem;
 }
+.hp-listing--view-block .hp-listing__details-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 0;
+  border-radius: 3px;
+  padding: 0.625rem 0.75rem;
+  background-color: rgba(7, 36, 86, 0.045);
+  color: rgba(15, 23, 39, 0.65);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.25s, color 0.25s;
+}
+.hp-listing--view-block .hp-listing__details-toggle:hover,
+.hp-listing--view-block .hp-listing__details-toggle:focus-visible {
+  background-color: rgba(7, 36, 86, 0.085);
+  color: rgba(15, 23, 39, 0.85);
+}
+.hp-listing--view-block .hp-listing__details-toggle:focus-visible {
+  outline: 2px solid #ffc107;
+  outline-offset: 2px;
+}
+.hp-listing--view-block .hp-listing__details-toggle::after {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  font-style: normal;
+  font-variant: normal;
+  line-height: 1;
+  display: inline-block;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: auto;
+  content: '\f078';
+  margin-left: 0.75rem;
+  font-size: 11px;
+  color: rgba(7, 36, 86, 0.35);
+  transition: transform 0.25s;
+}
+.hp-listing--view-block .hp-listing__details-toggle[aria-expanded='true']::after {
+  transform: rotate(180deg);
+}
+.hp-listing--view-block .hp-listing__details-toggle + .hp-listing__attributes--secondary {
+  margin-top: 0.75rem;
+}
 .hp-listing__details .hp-listing__categories {
   display: none !important;
 }
