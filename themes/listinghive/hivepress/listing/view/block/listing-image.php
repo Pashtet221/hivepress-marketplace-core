@@ -2,7 +2,7 @@
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
-$images      = (array) $listing->get_images();
+$images      = array_values( (array) $listing->get_images() );
 $image_count = count( $images );
 $listing_url = hivepress()->router->get_url( 'listing_view_page', [ 'listing_id' => $listing->get_id() ] );
 ?>
