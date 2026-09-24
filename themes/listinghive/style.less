@@ -962,6 +962,62 @@ HivePress
 			}
 		}
 
+		&__image--preview {
+			position: relative;
+			aspect-ratio: 4 / 3;
+			overflow: hidden;
+			background-color: #f2f2f2;
+		}
+
+		&__image-link {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+
+		&__image--preview &__image-slide {
+			position: absolute;
+			inset: 0;
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			opacity: 0;
+			visibility: hidden;
+			transition: opacity 0.12s ease;
+		}
+
+		&__image--preview &__image-slide--active {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		&__image-pagination {
+			position: absolute;
+			right: 0.75rem;
+			bottom: 0.75rem;
+			display: flex;
+			max-width: calc(100% - 1.5rem);
+			gap: 0.3rem;
+			z-index: 2;
+		}
+
+		&__image-dot {
+			width: 6px;
+			height: 6px;
+			flex: 0 1 6px;
+			border-radius: 9999px;
+			background-color: rgba(255, 255, 255, 0.55);
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+			transition: width 0.12s ease, flex-basis 0.12s ease, background-color 0.12s ease;
+		}
+
+		&__image-dot--active {
+			width: 14px;
+			flex-basis: 14px;
+			background-color: #fff;
+		}
+
 		&__images {
 			&-slider {
 				border-radius: @border-radius;
