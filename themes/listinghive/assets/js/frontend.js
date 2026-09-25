@@ -5,7 +5,8 @@
 		listingDetailsLabels = {
 			show: 'Показать характеристики',
 			hide: 'Скрыть характеристики'
-		};
+		},
+		listingImageSwipe = null;
 
 	function showListingImage(container, index) {
 		var slides = container.querySelectorAll('.hp-listing__image-slide'),
@@ -99,7 +100,7 @@
 			bounds,
 			index;
 
-		if (!container || event.pointerType === 'touch' || Number(container.dataset.imageCount) < 2) {
+		if (!container || event.pointerType !== 'mouse' || !window.matchMedia('(hover: hover) and (pointer: fine)').matches || Number(container.dataset.imageCount) < 2) {
 			return;
 		}
 
@@ -109,8 +110,84 @@
 	});
 
 	document.addEventListener('pointerleave', function(event) {
-		if (event.target.classList && event.target.classList.contains('hp-listing__image--preview')) {
+		if (event.pointerType === 'mouse' && event.target.classList && event.target.classList.contains('hp-listing__image--preview')) {
 			showListingImage(event.target, 0);
+		}
+	}, true);
+
+	document.addEventListener('pointerdown', function(event) {
+		var container = event.target.closest('.hp-listing__image--preview');
+
+		if (event.pointerType !== 'touch' || !container || Number(container.dataset.imageCount) < 2) {
+			return;
+		}
+
+		listingImageSwipe = {
+			container: container,
+			pointerID: event.pointerId,
+			startX: event.clientX,
+			startY: event.clientY
+		};
+	});
+
+	document.addEventListener('pointermove', function(event) {
+		var deltaX,
+			deltaY;
+
+		if (!listingImageSwipe || event.pointerId !== listingImageSwipe.pointerID) {
+			return;
+		}
+
+		deltaX = event.clientX - listingImageSwipe.startX;
+		deltaY = event.clientY - listingImageSwipe.startY;
+
+		if (Math.abs(deltaX) > Math.abs(deltaY) && event.cancelable) {
+			event.preventDefault();
+		}
+	}, { passive: false });
+
+	document.addEventListener('pointerup', function(event) {
+		var container,
+			deltaX,
+			deltaY,
+			threshold,
+			index;
+
+		if (!listingImageSwipe || event.pointerId !== listingImageSwipe.pointerID) {
+			return;
+		}
+
+		container = listingImageSwipe.container;
+		deltaX = event.clientX - listingImageSwipe.startX;
+		deltaY = event.clientY - listingImageSwipe.startY;
+		listingImageSwipe = null;
+		threshold = Math.min(80, Math.max(35, container.clientWidth * 0.12));
+
+		if (Math.abs(deltaX) < threshold || Math.abs(deltaX) <= Math.abs(deltaY)) {
+			return;
+		}
+
+		index = Number(container.dataset.imageIndex || 0) + (deltaX < 0 ? 1 : -1);
+		showListingImage(container, index);
+		container.dataset.preventImageClick = Date.now();
+	});
+
+	document.addEventListener('pointercancel', function(event) {
+		if (listingImageSwipe && event.pointerId === listingImageSwipe.pointerID) {
+			listingImageSwipe = null;
+		}
+	});
+
+	document.addEventListener('click', function(event) {
+		var container = event.target.closest('.hp-listing__image--preview');
+
+		if (container && container.dataset.preventImageClick) {
+			if (Date.now() - Number(container.dataset.preventImageClick) < 700) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+
+			delete container.dataset.preventImageClick;
 		}
 	}, true);
 

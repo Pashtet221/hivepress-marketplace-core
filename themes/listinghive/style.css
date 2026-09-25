@@ -800,6 +800,7 @@ HivePress
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background-color: #f2f2f2;
+  touch-action: pan-y;
 }
 .hp-listing__image-link {
   display: block;
