@@ -4,32 +4,42 @@
 		<?php if ( ! is_singular( [ 'post', 'page' ] ) || ! get_post_meta( get_the_ID(), 'ht_hide_footer', true ) ) : ?>
 			<footer class="site-footer">
 				<div class="container">
-					<?php if ( is_active_sidebar( 'site_footer' ) ) : ?>
-						<div class="footer-widgets">
-							<div class="row">
-								<?php dynamic_sidebar( 'site_footer' ); ?>
-							</div>
+					<div class="marketplace-footer">
+						<div class="marketplace-footer__about">
+							<h2 class="marketplace-footer__title"><?php esc_html_e( 'Маркетплейс спецтехники', 'listinghive' ); ?></h2>
+							<p><?php esc_html_e( 'Площадка для покупки, продажи и аренды строительной, грузовой и сельскохозяйственной техники.', 'listinghive' ); ?></p>
 						</div>
-					<?php endif; ?>
+						<nav class="marketplace-footer__section" aria-label="<?php esc_attr_e( 'Навигация в подвале', 'listinghive' ); ?>">
+							<h2 class="marketplace-footer__heading"><?php esc_html_e( 'Навигация', 'listinghive' ); ?></h2>
+							<ul>
+								<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Главная', 'listinghive' ); ?></a></li>
+								<li><a href="<?php echo esc_url( home_url( '/listings/' ) ); ?>"><?php esc_html_e( 'Каталог спецтехники', 'listinghive' ); ?></a></li>
+								<li><a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>"><?php esc_html_e( 'Статьи о технике', 'listinghive' ); ?></a></li>
+							</ul>
+						</nav>
+						<nav class="marketplace-footer__section" aria-label="<?php esc_attr_e( 'Разделы для участников', 'listinghive' ); ?>">
+							<h2 class="marketplace-footer__heading"><?php esc_html_e( 'Участникам', 'listinghive' ); ?></h2>
+							<ul>
+								<li><a href="<?php echo esc_url( home_url( '/submit-listing/' ) ); ?>"><?php esc_html_e( 'Разместить объявление', 'listinghive' ); ?></a></li>
+								<li><a href="<?php echo esc_url( home_url( '/account/' ) ); ?>"><?php esc_html_e( 'Личный кабинет', 'listinghive' ); ?></a></li>
+								<li><a href="<?php echo esc_url( home_url( '/listings/' ) ); ?>"><?php esc_html_e( 'Найти технику', 'listinghive' ); ?></a></li>
+							</ul>
+						</nav>
+					</div>
 					<div class="footer-navbar">
-						<?php if ( get_theme_mod( 'copyright_notice' ) ) : ?>
-							<div class="footer-navbar__start">
-								<div class="footer-navbar__copyright">
-									<?php echo wp_kses_post( get_theme_mod( 'copyright_notice' ) ); ?>
-								</div>
-							</div>
-						<?php endif; ?>
-						<div class="footer-navbar__end">
-							<nav class="footer-navbar__menu">
+						<div class="footer-navbar__start">
+							<div class="footer-navbar__copyright">
 								<?php
-								wp_nav_menu(
-									[
-										'theme_location' => 'footer',
-										'container'      => 'ul',
-									]
+								printf(
+									/* translators: %s: current year. */
+									esc_html__( '© %s Маркетплейс спецтехники. Все права защищены.', 'listinghive' ),
+									esc_html( wp_date( 'Y' ) )
 								);
 								?>
-							</nav>
+							</div>
+						</div>
+						<div class="footer-navbar__end">
+							<p class="marketplace-footer__tagline"><?php esc_html_e( 'Надёжная техника для серьёзных задач', 'listinghive' ); ?></p>
 						</div>
 					</div>
 				</div>

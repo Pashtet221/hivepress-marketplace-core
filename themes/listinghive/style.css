@@ -14,6 +14,7 @@ Tags: right-sidebar, custom-colors, custom-menu, custom-logo, custom-header, fea
 Text Domain: listinghive
 Domain Path: /languages
 */
+.marketplace-footer{display:grid;grid-template-columns:minmax(0,2fr) repeat(2,minmax(10rem,1fr));gap:2rem 4rem;padding:1rem 0 3rem;margin-bottom:2rem;border-bottom:1px solid rgba(7,36,86,.075)}.marketplace-footer__title,.marketplace-footer__heading{margin:0 0 1rem;color:rgba(15,23,39,.85)}.marketplace-footer__title{font-size:1.5rem}.marketplace-footer__heading{font-size:1rem}.marketplace-footer__about p{max-width:34rem;margin:0}.marketplace-footer__section ul{margin:0;list-style:none}.marketplace-footer__section li:not(:last-child){margin-bottom:.65rem}.marketplace-footer__tagline{margin:0;color:rgba(15,23,39,.45)}@media only screen and (max-width:47.99em){.marketplace-footer{grid-template-columns:1fr 1fr}.marketplace-footer__about{grid-column:1/-1}.marketplace-footer__tagline{text-align:center}}@media only screen and (max-width:31.99em){.marketplace-footer{grid-template-columns:1fr}.marketplace-footer__about{grid-column:auto}}
 /*--------------------------------------------------------------
 Normalize
 --------------------------------------------------------------*/
