@@ -46,6 +46,71 @@ Domain Path: /languages
 	}
 }
 
+/*--------------------------------------------------------------
+Marketplace footer
+--------------------------------------------------------------*/
+.marketplace-footer {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) repeat(2, minmax(10rem, 1fr));
+	gap: 2rem 4rem;
+	padding: 1rem 0 3rem;
+	margin-bottom: 2rem;
+	border-bottom: 1px solid rgba(7, 36, 86, .075);
+
+	&__title,
+	&__heading {
+		margin: 0 0 1rem;
+		color: rgba(15, 23, 39, .85);
+	}
+
+	&__title {
+		font-size: 1.5rem;
+	}
+
+	&__heading {
+		font-size: 1rem;
+	}
+
+	&__about p {
+		max-width: 34rem;
+		margin: 0;
+	}
+
+	&__section ul {
+		margin: 0;
+		list-style: none;
+	}
+
+	&__section li:not(:last-child) {
+		margin-bottom: .65rem;
+	}
+
+	&__tagline {
+		margin: 0;
+		color: rgba(15, 23, 39, .45);
+	}
+
+	@media only screen and (max-width: 47.99em) {
+		grid-template-columns: 1fr 1fr;
+
+		&__about {
+			grid-column: 1 / -1;
+		}
+
+		&__tagline {
+			text-align: center;
+		}
+	}
+
+	@media only screen and (max-width: 31.99em) {
+		grid-template-columns: 1fr;
+
+		&__about {
+			grid-column: auto;
+		}
+	}
+}
+
 .container-overlay() {
 	content: '';
 	display: block;
