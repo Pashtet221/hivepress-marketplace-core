@@ -392,6 +392,18 @@ Header
 			background-color: rgba(0, 0, 0, 0.35);
 		}
 	}
+
+	// The front-page artwork already contains its copy, so show it as a complete banner.
+	&--banner {
+		aspect-ratio: 2 / 1;
+		background-position: center;
+		background-size: contain;
+		padding: 0;
+
+		&::after {
+			display: none;
+		}
+	}
 }
 
 /*--------------------------------------------------------------

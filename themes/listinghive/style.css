@@ -187,6 +187,15 @@ Header
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.35);
 }
+.header-hero--banner {
+  aspect-ratio: 2 / 1;
+  background-position: center;
+  background-size: contain;
+  padding: 0;
+}
+.header-hero--banner::after {
+  display: none;
+}
 /*--------------------------------------------------------------
 Content
 --------------------------------------------------------------*/

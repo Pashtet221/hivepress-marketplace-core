@@ -114,9 +114,14 @@ final class Theme extends Component {
 
 		// Get classes.
 		$classes = [];
+		$is_front_banner = is_front_page() && ( get_header_image() || has_post_thumbnail() );
 
 		if ( get_header_image() || has_post_thumbnail() ) {
 			$classes[] = 'header-hero--cover';
+
+			if ( $is_front_banner ) {
+				$classes[] = 'header-hero--banner';
+			}
 
 			if ( is_single() ) {
 				$classes[] = 'header-hero--large';
@@ -124,7 +129,7 @@ final class Theme extends Component {
 		}
 
 		// Render header.
-		if ( is_page() ) {
+		if ( is_page() && ! $is_front_banner ) {
 
 			// Get content.
 			$content = '';
@@ -212,12 +217,13 @@ final class Theme extends Component {
 		}
 
 		// Add wrapper.
-		if ( $output ) {
+		if ( $output || $is_front_banner ) {
 			$output = hivetheme()->template->render_part(
 				'templates/page/page-header',
 				[
-					'class'   => implode( ' ', $classes ),
-					'content' => $output,
+					'class'    => implode( ' ', $classes ),
+					'content'  => $output,
+					'parallax' => get_theme_mod( 'header_image_parallax' ) && ! $is_front_banner,
 				]
 			);
 		}
