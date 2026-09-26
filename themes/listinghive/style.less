@@ -47,6 +47,36 @@ Domain Path: /languages
 }
 
 /*--------------------------------------------------------------
+Header logo
+--------------------------------------------------------------*/
+.header-logo {
+	.custom-logo-link {
+		display: flex;
+		align-items: center;
+		max-width: 15rem;
+	}
+
+	.custom-logo {
+		width: auto;
+		height: 4rem;
+		max-width: 100%;
+		object-fit: contain;
+	}
+}
+
+@media only screen and (max-width: 47.99em) {
+	.header-logo {
+		.custom-logo-link {
+			max-width: 11rem;
+		}
+
+		.custom-logo {
+			height: 3rem;
+		}
+	}
+}
+
+/*--------------------------------------------------------------
 Marketplace footer
 --------------------------------------------------------------*/
 .marketplace-footer {
