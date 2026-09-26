@@ -105,3 +105,67 @@ function listinghive_migrate_header_menu() {
 	set_theme_mod( 'listinghive_header_menu_version', '1' );
 }
 add_action( 'init', 'listinghive_migrate_header_menu', 30 );
+
+/**
+ * Adds the user's favorites and messages to the header navigation.
+ *
+ * These links are generated at render time because their counters are
+ * different for every signed-in user. HivePress prepares both values in the
+ * request context before the header is rendered.
+ *
+ * @param string   $items Menu items HTML.
+ * @param stdClass $args  Menu arguments.
+ * @return string
+ */
+function listinghive_add_account_header_menu_items( $items, $args ) {
+	if ( ! is_user_logged_in() || empty( $args->theme_location ) || 'header' !== $args->theme_location || ! function_exists( 'hivepress' ) ) {
+		return $items;
+	}
+
+	$menu_items = [];
+	$routes     = [
+		[
+			'name'  => 'listings_favorite_page',
+			'label' => 'Избранное',
+			'count' => count( (array) hivepress()->request->get_context( 'favorite_ids', [] ) ),
+			'class' => 'favorites',
+		],
+		[
+			'name'  => 'messages_thread_page',
+			'label' => 'Сообщения',
+			'count' => absint( hivepress()->request->get_context( 'message_unread_count' ) ),
+			'class' => 'messages',
+		],
+	];
+
+	foreach ( $routes as $route ) {
+		if ( ! hivepress()->router->get_route( $route['name'] ) ) {
+			continue;
+		}
+
+		$classes = [
+			'menu-item',
+			'menu-item--account-' . $route['class'],
+		];
+
+		if ( $route['name'] === hivepress()->router->get_current_route_name() ) {
+			$classes[] = 'current-menu-item';
+		}
+
+		$menu_items[] = sprintf(
+			'<li class="%1$s"><a href="%2$s"><span>%3$s</span><small class="header-menu__count" aria-label="%4$s">%5$d</small></a></li>',
+			esc_attr( implode( ' ', $classes ) ),
+			esc_url( hivepress()->router->get_url( $route['name'] ) ),
+			esc_html( $route['label'] ),
+			esc_attr( sprintf( '%s: %d', $route['label'], $route['count'] ) ),
+			$route['count']
+		);
+	}
+
+	if ( $menu_items ) {
+		$items .= implode( '', $menu_items );
+	}
+
+	return $items;
+}
+add_filter( 'wp_nav_menu_items', 'listinghive_add_account_header_menu_items', 10, 2 );
