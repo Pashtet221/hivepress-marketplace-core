@@ -10,3 +10,6 @@ require_once __DIR__ . '/includes/yandex-maps.php';
 
 // Replace the imported demo navigation with the marketplace navigation.
 require_once __DIR__ . '/includes/header-menu.php';
+
+// Assign the uploaded marketplace artwork to its listing categories.
+require_once __DIR__ . '/includes/listing-category-images.php';
