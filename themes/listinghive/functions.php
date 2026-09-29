@@ -13,3 +13,6 @@ require_once __DIR__ . '/includes/header-menu.php';
 
 // Assign the uploaded marketplace artwork to its listing categories.
 require_once __DIR__ . '/includes/listing-category-images.php';
+
+// Expose a narrow Bridge endpoint for listing category images.
+require_once __DIR__ . '/includes/listing-category-image-api.php';
